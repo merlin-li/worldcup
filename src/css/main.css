@@ -12,7 +12,7 @@ body {
     position: relative;
 }
 .worldcup__banner {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
 }
 .worldcup__banner section {
     height: 5rem;
@@ -61,6 +61,7 @@ body {
 }
 .worldcup__menu {
     text-align: center;
+    font-size: 1.8rem;
 }
 .worldcup__menu a {
     text-decoration: none;

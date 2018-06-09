@@ -50,7 +50,6 @@ export default class Marketplace extends React.Component {
                         hasLogin: true,
                         walletAddress: accounts[0]
                     });
-                    console.log(this.state);
                 }
             })
         } else {
