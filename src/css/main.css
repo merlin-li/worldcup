@@ -33,11 +33,7 @@ body {
     height: 10rem;
     line-height: 10rem;
     margin-top: 3rem;
-    position: fixed;
-    bottom: 0;
     width: 100%;
-    left: 0;
-
 }
 .worldcup__footer a {
     text-decoration: none;
@@ -324,7 +320,7 @@ a.button__largest {
     border: solid 1px #ddd;
     width: 90%;
     border-radius: 1rem;
-    margin: 0 auto;
+    margin: 0 auto 2.5rem;
     padding-bottom: 1rem;;
 }
 .marketplace__teams img {
