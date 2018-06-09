@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Web3 from 'web3';
-import Contract from 'truffle-contract';
+import TruffleContract from 'truffle-contract';
 import axios from 'axios';
 
 let WorldCupApp = {
@@ -19,7 +19,52 @@ let WorldCupApp = {
         return WorldCupApp.initContract();
     },
     initContract() {
+        axios.get('/data/Adoption.json').then(res => {
+            let data = res.data;
+            WorldCupApp.contracts.Adoption = TruffleContract(data);
+            WorldCupApp.contracts.Adoption.setProvider(WorldCupApp.web3Provider);
+            WorldCupApp.markAdopted();
+        });
+    },
+    markAdopted() {
+        let adoptionInstance;
 
+        WorldCupApp.contracts.Adoption.deployed().then((instance) => {
+            adoptionInstance = instance;
+
+            return adoptionInstance.getAdopters.call();
+        }).then((adopters) => {
+            console.log(adopters);
+            for (let i = 0; i < adopters.length; i++) {
+                if (adopters[i] !== '0x0000000000000000000000000000000000000000') {
+                    // 这里是回调函数
+                }
+            }
+        }).catch((err) => {
+            console.log(err.message);
+        });
+    },
+    handleAdopt(teamId) {
+        let adoptionInstance;
+
+        window.web3.eth.getAccounts((error, accounts) => {
+            if (error) {
+                console.log(error);
+            }
+
+            let account = accounts[0];
+
+            WorldCupApp.contracts.Adoption.deployed().then((instance) => {
+                adoptionInstance = instance;
+
+                // Execute adopt as a transaction by sending account
+                return adoptionInstance.adopt(teamId, {from: account});
+            }).then((result) => {
+                return WorldCupApp.markAdopted();
+            }).catch((err) => {
+                console.log(err.message);
+            });
+        });
     }
 };
 
@@ -34,35 +79,31 @@ export default class Marketplace extends React.Component {
     }
 
     componentDidMount() {
-        let hasLogin = false;
-
-        if (typeof web3 !== 'undefined') {
-            window.web3 = new Web3(window.web3.currentProvider);
-            window.web3.eth.getAccounts((error, accounts) => {
-                if (accounts.length == 0) {
-                    hasLogin = false;
-                    this.setState({
-                        hasLogin: false
-                    });
-                } else {
-                    hasLogin = true;
-                    this.setState({
-                        hasLogin: true,
-                        walletAddress: accounts[0]
-                    });
-                }
-            })
-        } else {
-            hasLogin = false;
-            console.log('No web3? You should consider trying MetaMask!')
-        }
         this.renderTeams();
+        WorldCupApp.initWeb3();
     }
 
-    buyTeam = () => {
-        console.log('you clicked me.');
+    buyTeam = (team) => {
+        console.log('you clicked me.', team);
+        // WorldCupApp.handleAdopt(team.id);
+        team.price = 11111;
+        team.name = 'xxxxx';
+        let copyTeams = this.state.teams;
+        copyTeams.map(item => {
+            if (item.id === team.id) {
+                item.price = 22222;
+                item.name = 'xxxxx';
+                return {
+                    ...item
+                };
+            }
+        });
+        this.setState({
+            teams: copyTeams
+        });
     }
 
+    // 渲染球队
     renderTeams() {
         let result = [];
         axios.get('/data/teams.json').then(res => {
