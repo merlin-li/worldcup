@@ -16,7 +16,6 @@ export default class Marketplace extends React.Component {
     }
 
     buyTeam = (team) => {
-        console.log('you clicked me.', team);
         // WorldCupApp.handleBuyTeam(team.id);
         // team.price = 11111;
         // team.name = 'xxxxx';
@@ -33,29 +32,67 @@ export default class Marketplace extends React.Component {
         // this.setState({
         //     teams: copyTeams
         // });
+        if (window.worldcupContract && window.web3) {
+            let teamId = parseInt(team._tokenId);
+
+            window.web3.eth.getAccounts((error, accounts) => {
+                if (accounts && accounts.length) {
+                    let currentAccount = accounts[0];
+
+                    window.worldcupContract.methods.buyTeam(teamId).send({
+                        from: currentAccount,
+                        value: 1
+                    })
+                    .on('transactionHash', hash => {
+                        console.log(hash);
+                    })
+                    .on('confirmation', (confirmationNumber, receipt) => {
+                        console.log(receipt);
+                    })
+                    .on('receipt', receipt => {
+                        console.log(receipt);
+                    })
+                    .on('error', err => {
+                        console.log(err);
+                    });
+                }
+            });
+        }
     }
 
     // 渲染球队
     renderTeams() {
         let Web3 = require('web3');
         // 创建web3对象
-        let web3 = new Web3();
+        // let web3 = new Web3();
         let worldcupContract = null;
+        let web3Provider;
         let worldcupTeams = [];
+
+        // Is there an injected web3 instance?
+        if (typeof window.web3 !== 'undefined') {
+            web3Provider = window.web3.currentProvider;
+        } else {
+            // If no injected web3 instance is detected, fall back to Ganache
+            web3Provider = new Web3.providers.HttpProvider('http://127.0.0.1:7545');
+        }
+
         // 连接到以太坊节点
-        web3.setProvider(new Web3.providers.HttpProvider("http://127.0.0.1:7545"));
+        // web3.setProvider(new Web3.providers.HttpProvider('http://127.0.0.1:7545'));
+        var web3 = new Web3(web3Provider);
 
         let formatPrice = (price) => {
-            return price / 1000000000000000000;
-        }
+            return price / 100000000000000000;
+        };
 
         axios.get('/data/SparkCup.json').then(res => {
             let data = res.data;
-            let address = '0xdd804cc059e5a825b47c76d7050fe22f13805d29';
+            let address = '0x348c1eddaf55e4145e4c879a6e26ee58708f6b0f';
             let SparkCup = new web3.eth.Contract(data.abi, address);
             let getAllTeamsPromise = [];
 
             worldcupContract = SparkCup;
+            window.worldcupContract = worldcupContract;
 
             // get all teams.
             for (let i = 0; i < 32; i++) {

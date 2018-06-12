@@ -347,3 +347,7 @@ a.button__largest {
     height: 3rem;
     line-height: 3rem;
 }
+.prizepool__box {
+    width: 60%;
+    margin: 10rem auto;
+}

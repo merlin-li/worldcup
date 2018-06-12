@@ -5,6 +5,7 @@ import Marketplace from './Marketplace';
 import Signin from './Signin';
 import Header from '../components/layouts/Header';
 import Footer from '../components/layouts/Footer';
+import Prizepool from './Prizepool';
 
 export default class App extends React.Component {
     render() {
@@ -15,6 +16,7 @@ export default class App extends React.Component {
                     <Route exact path='/' component={Homepage} />
                     <Route exact path='/signin' component={Signin} />
                     <Route exact path='/marketplace' component={Marketplace} />
+                    <Route exact path='/prizepool' component={Prizepool} />
                     <Footer />
                 </section>
             </Router>
