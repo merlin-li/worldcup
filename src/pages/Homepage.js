@@ -2,10 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 export default class Homepage extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return (
             <section>

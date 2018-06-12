@@ -330,7 +330,7 @@ a.button__largest {
     margin-top: 1rem;
 }
 .marketplace__box button {
-    width: 10rem;
+    width: 80%;
     height: 3rem;
     border: solid 1px #ddd;
     border-radius: 0.5rem;

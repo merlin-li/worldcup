@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Web3 from 'web3';
 
 export default class Signin extends React.Component {
@@ -17,7 +16,7 @@ export default class Signin extends React.Component {
             if (typeof web3 !== 'undefined') {
                 window.web3 = new Web3(window.web3.currentProvider);
                 window.web3.eth.getAccounts((error, accounts) => {
-                    if (accounts.length == 0) {
+                    if (accounts.length === 0) {
                         hasLogin = false;
                         this.setState({
                             hasLogin: false
