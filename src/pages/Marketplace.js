@@ -1,44 +1,5 @@
 import React from 'react';
-import TruffleContract from 'truffle-contract';
 import axios from 'axios';
-// import Web3 from 'web3';
-
-let WorldCupApp = {
-    currentAccount: '',
-    contract: null,
-    teams: [],
-    // 初始化web3
-    initWeb3(callback) {
-        var Web3 = require('web3');
-        // 创建web3对象
-        var web3 = new Web3();
-        // 连接到以太坊节点
-        web3.setProvider(new Web3.providers.HttpProvider("http://127.0.0.1:7545"));
-
-        axios.get('/data/SparkCup.json').then(res => {
-            var data = res.data;
-            var address = '0xdd804cc059e5a825b47c76d7050fe22f13805d29';
-            var SparkCup = new web3.eth.Contract(data.abi, address);
-
-            WorldCupApp.contract = SparkCup;
-
-            // get all teams.
-            WorldCupApp.getAllTeams(callback);
-        });
-    },
-    getAllTeams(callback) {
-        for (let i = 0; i < 32; i++) {
-            WorldCupApp.contract.methods.getTeam(i).call((err, result) => {
-                WorldCupApp.teams.push({
-                    ...result,
-                    flag: '/images/' + result._code.toLowerCase() + '.jpeg',
-                    key: result._tokenId
-                });
-            })
-        }
-        callback(WorldCupApp.teams);
-    }
-};
 
 export default class Marketplace extends React.Component {
     constructor(props) {
@@ -48,16 +9,15 @@ export default class Marketplace extends React.Component {
             walletAddress: '',
             teams: []
         };
-        this.renderTeams = this.renderTeams.bind(this);
     }
 
     componentDidMount() {
-        WorldCupApp.initWeb3(this.renderTeams);
+        this.renderTeams();
     }
 
     buyTeam = (team) => {
         console.log('you clicked me.', team);
-        WorldCupApp.handleBuyTeam(team.id);
+        // WorldCupApp.handleBuyTeam(team.id);
         // team.price = 11111;
         // team.name = 'xxxxx';
         // let copyTeams = this.state.teams;
@@ -76,34 +36,60 @@ export default class Marketplace extends React.Component {
     }
 
     // 渲染球队
-    renderTeams(teams) {
-        // let result = [];
-        // axios.get('/data/teams.json').then(res => {
-        //     if (res.data && res.data.length) {
-        //         result = res.data.map(item => ({
-        //             ...item,
-        //             key: item.id
-        //         }));
-        //
-        //         this.setState({
-        //             teams: result
-        //         });
-        //     }
-        // });
-        console.log(teams);
-        this.setState({ teams });
+    renderTeams() {
+        let Web3 = require('web3');
+        // 创建web3对象
+        let web3 = new Web3();
+        let worldcupContract = null;
+        let worldcupTeams = [];
+        // 连接到以太坊节点
+        web3.setProvider(new Web3.providers.HttpProvider("http://127.0.0.1:7545"));
+
+        let formatPrice = (price) => {
+            return price / 1000000000000000000;
+        }
+
+        axios.get('/data/SparkCup.json').then(res => {
+            let data = res.data;
+            let address = '0xdd804cc059e5a825b47c76d7050fe22f13805d29';
+            let SparkCup = new web3.eth.Contract(data.abi, address);
+            let getAllTeamsPromise = [];
+
+            worldcupContract = SparkCup;
+
+            // get all teams.
+            for (let i = 0; i < 32; i++) {
+                getAllTeamsPromise.push(new Promise((resolve, reject) => {
+                    worldcupContract.methods.getTeam(i).call().then(result => {
+                        worldcupTeams.push({
+                            ...result,
+                            flag: '/images/' + result._code.toLowerCase() + '.jpeg',
+                            key: result._tokenId,
+                            price: formatPrice(result._price)
+                        });
+                        resolve();
+                    }).catch(reject);
+                }));
+            }
+
+            Promise.all(getAllTeamsPromise).then(() => {
+                this.setState({
+                    teams: worldcupTeams
+                });
+            });
+        });
     }
 
     render() {
         let result = [];
         if (this.state && this.state.teams && this.state.teams.length) {
             result = this.state.teams.map(team => (
-                <li key={team._id}>
+                <li key={team._tokenId}>
                     <div className="marketplace__box">
                         <span>{team._name}</span>
-                        <img src={'/' + team.flag} alt="" />
+                        <img src={team.flag} alt="" />
                         <div>
-                            Price: {team._price} ETH
+                            Price: {team.price} ETH
                         </div>
                         <button onClick={() => this.buyTeam(team)}>Buy</button>
                     </div>
