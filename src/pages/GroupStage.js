@@ -2,6 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import { Row, Col, Button } from 'antd';
+import CONFIG from '../components/common';
+
+const { formatPrice, contractAddress, httpProvider } = CONFIG;
 
 export default class GroupState extends React.Component {
     constructor(props) {
@@ -12,6 +15,29 @@ export default class GroupState extends React.Component {
     }
     componentDidMount() {
         this.renderMatches();
+
+        let Web3 = require('web3');
+        let worldcupContract = null;
+        let web3Provider;
+
+        // Is there an injected web3 instance?
+        if (typeof window.web3 !== 'undefined') {
+            web3Provider = window.web3.currentProvider;
+        } else {
+            // If no injected web3 instance is detected, fall back to Ganache
+            web3Provider = new Web3.providers.HttpProvider(httpProvider);
+        }
+
+        var web3 = new Web3(web3Provider);
+
+        axios.get('/data/SparkCup.json').then(res => {
+            let data = res.data;
+            let SparkCup = new web3.eth.Contract(data.abi, contractAddress);
+            let getAllTeamsPromise = [];
+
+            worldcupContract = SparkCup;
+            window.worldcupContract = worldcupContract;
+        });
     }
 
     renderMatches() {
@@ -27,9 +53,12 @@ export default class GroupState extends React.Component {
                     }
                 });
             }
-            console.log(matches);
             this.setState({ matches });
         });
+    }
+
+    openResult(match, flag) {
+        console.log(match, flag);
     }
 
     render() {
@@ -52,9 +81,9 @@ export default class GroupState extends React.Component {
                         {m.country2}
                     </Col>
                     <Col span={6}>
-                        <Button>{m.country1}赢</Button>
-                        <Button>{m.country2}赢</Button>
-                        <Button>平局</Button>
+                        <Button onClick={() => this.openResult(m, 'win')}>{m.country1}赢</Button>
+                        <Button onClick={() => this.openResult(m, 'fail')}>{m.country2}赢</Button>
+                        <Button onClick={() => this.openResult(m, 'tie')}>平局</Button>
                     </Col>
                 </Row>
             ));

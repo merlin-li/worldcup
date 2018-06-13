@@ -2,10 +2,10 @@ import React from 'react';
 import axios from 'axios';
 import { notification } from 'antd';
 import 'antd/dist/antd.css';
+import CONFIG from '../components/common';
 
-const formatPrice = (price) => {
-    return price / 1000000000000000000;
-};
+const { formatPrice, contractAddress, httpProvider } = CONFIG;
+
 export default class Marketplace extends React.Component {
     constructor(props) {
         super(props);
@@ -26,7 +26,6 @@ export default class Marketplace extends React.Component {
         let teamPrice = team._price;
         let teamName = team._name;
         let teamOwner = team._owner;
-        let me = this;
         let currentAccount;
 
         if (window.worldcupContract && window.web3) {
@@ -35,7 +34,7 @@ export default class Marketplace extends React.Component {
                     currentAccount = accounts[0];
 
                     // 如果球队的owner和当前账号为同一人，不能购买
-                    if (currentAccount.toLowerCase() == teamOwner.toLowerCase()) {
+                    if (currentAccount.toLowerCase() === teamOwner.toLowerCase()) {
                         notification.warning({
                             message: 'Failed!',
                             description: 'You are already the owner of this team!'
@@ -87,17 +86,14 @@ export default class Marketplace extends React.Component {
             web3Provider = window.web3.currentProvider;
         } else {
             // If no injected web3 instance is detected, fall back to Ganache
-            web3Provider = new Web3.providers.HttpProvider('http://127.0.0.1:7545');
+            web3Provider = new Web3.providers.HttpProvider(httpProvider);
         }
 
-        // 连接到以太坊节点
-        // web3.setProvider(new Web3.providers.HttpProvider('http://127.0.0.1:7545'));
         var web3 = new Web3(web3Provider);
 
         axios.get('/data/SparkCup.json').then(res => {
             let data = res.data;
-            let address = '0x348c1eddaf55e4145e4c879a6e26ee58708f6b0f';
-            let SparkCup = new web3.eth.Contract(data.abi, address);
+            let SparkCup = new web3.eth.Contract(data.abi, contractAddress);
             let getAllTeamsPromise = [];
 
             worldcupContract = SparkCup;

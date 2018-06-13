@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
+import CONFIG from '../components/common';
+
+const { formatPrice, contractAddress, httpProvider } = CONFIG;
 
 export default class Prizepool extends React.Component {
     constructor(props) {
@@ -17,28 +20,27 @@ export default class Prizepool extends React.Component {
     }
     componentDidMount() {
         let Web3 = require('web3');
-        // 创建web3对象
-        let web3 = new Web3();
+        // let web3 = new Web3();
         let worldcupContract = null;
-        let worldcupTeams = [];
-        // 连接到以太坊节点
-        web3.setProvider(new Web3.providers.HttpProvider("http://127.0.0.1:7545"));
-        window.web3 = web3;
+        let web3Provider;
 
-        let formatPrice = (price) => {
-            return price / 1000000000000000000;
+        // Is there an injected web3 instance?
+        if (typeof window.web3 !== 'undefined') {
+            web3Provider = window.web3.currentProvider;
+        } else {
+            // If no injected web3 instance is detected, fall back to Ganache
+            web3Provider = new Web3.providers.HttpProvider(httpProvider);
         }
+        let web3 = new Web3(web3Provider);
 
         axios.get('/data/SparkCup.json').then(res => {
             let data = res.data;
-            let address = '0x348c1eddaf55e4145e4c879a6e26ee58708f6b0f';
-            let SparkCup = new web3.eth.Contract(data.abi, address);
+            let SparkCup = new web3.eth.Contract(data.abi, contractAddress);
 
             worldcupContract = SparkCup;
 
             // get prize pool
             worldcupContract.methods.getPrizePool().call().then(result => {
-                console.log(result);
                 this.setState(result);
             });
         });
@@ -57,25 +59,25 @@ export default class Prizepool extends React.Component {
         return (
             <div className="prizepool__box">
                 <section>
-                    finalPoolTotal: {finalPoolTotal}
+                    奖池金额: {formatPrice(finalPoolTotal)} ETH
                 </section>
                 <section>
-                    last16Locked: {last16Locked}
+                    last16Locked: {last16Locked.toString()}
                 </section>
                 <section>
-                    last16PoolTotal: {last16PoolTotal}
+                    16强奖池: {formatPrice(last16PoolTotal)}
                 </section>
                 <section>
-                    quarterLocked: {quarterLocked}
+                    quarterLocked: {quarterLocked.toString()}
                 </section>
                 <section>
-                    quarterPoolTotal: {quarterPoolTotal}
+                    四分之一决赛奖池: {formatPrice(quarterPoolTotal)}
                 </section>
                 <section>
-                    semiLocked: {semiLocked}
+                    semiLocked: {semiLocked.toString()}
                 </section>
                 <section>
-                    semiPoolTotal: {semiPoolTotal}
+                    半决赛奖池: {formatPrice(semiPoolTotal)}
                 </section>
             </div>
         );
