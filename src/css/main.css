@@ -34,6 +34,7 @@ body {
     line-height: 10rem;
     margin-top: 3rem;
     width: 100%;
+    background:
 }
 .worldcup__footer a {
     text-decoration: none;
@@ -52,6 +53,16 @@ body {
 }
 .worldcup__logo {
     padding-left: 2rem;
+    position: relative;
+}
+.worldcup__logo i {
+    width: 4rem;
+    height: 4rem;
+    background: url('/images/fifaicon.png') no-repeat;
+    background-size: 100% 100%;
+    display: inline-block;
+    position: relative;
+    bottom: -0.5rem;
 }
 .worldcup__logo a {
     text-decoration: none;
@@ -350,4 +361,15 @@ a.button__largest {
 .prizepool__box {
     width: 60%;
     margin: 10rem auto;
+}
+.worldcup__signin {
+    width: 20rem;
+    margin: 0 auto 0;
+}
+.worldcup__signin img {
+    width: 100%;
+}
+.prizepool__box section {
+    font-size: 2rem;
+    line-height: 3rem;
 }

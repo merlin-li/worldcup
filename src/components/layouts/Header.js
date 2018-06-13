@@ -10,6 +10,7 @@ export default class Header extends React.Component {
 
                 <div className="worldcup__header">
                     <div className="worldcup__logo">
+                        <i></i>
                         <a href="/">CryptoWorldCup</a>
                     </div>
                     <div className="worldcup__menu">

@@ -60,11 +60,11 @@ export default class Signin extends React.Component {
         if (hasLogin) {
             Header = (
                 <section className="unlogin__header">
-                    <h3>Confirm your account details</h3>
+                    <h3>Welcome!</h3>
                     <p>Your wallet address is <span>{walletAddress}</span></p>
 
-                    <div>
-                        <img src="/images/profile-2.png" />
+                    <div className="worldcup__signin">
+                        <img src="/images/fifaicon.png" />
                     </div>
 
                     <div></div>
