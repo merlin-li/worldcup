@@ -46,6 +46,7 @@ body {
     height: 7rem;
     color: #000;
     line-height: 7rem;
+    position: relative;
 }
 .worldcup__header div {
     display: inline-block;
@@ -53,7 +54,8 @@ body {
 }
 .worldcup__logo {
     padding-left: 2rem;
-    position: relative;
+    position: absolute;
+    z-index: 100;
 }
 .worldcup__logo i {
     width: 4rem;
@@ -70,18 +72,23 @@ body {
     font-size: 2.4rem;
     color: #000;
 }
-.worldcup__menu {
+#worldcup__menu {
     text-align: center;
     font-size: 1.8rem;
+    position: absolute;
+    width: 100%;
+    height: 7rem;
+    left: 0;
+    top: 0;
 }
-.worldcup__menu a {
+#worldcup__menu a {
     text-decoration: none;
     font-weight: bold;
     color: #000;
     display: inline-block;
     margin-right: 2rem;
 }
-.worldcup__menu a:hover {
+#worldcup__menu a:hover {
     color: #e96bd4;
 }
 
@@ -372,4 +379,33 @@ a.button__largest {
 .prizepool__box section {
     font-size: 2rem;
     line-height: 3rem;
+}
+.match__list {
+    width: 80%;
+    margin: 5rem auto;
+    overflow: hidden;
+}
+.match__item {
+    border-top: 0.1rem solid #999;
+}
+.match__list .match__item {
+    height: 10rem;
+    margin: 1rem 0;
+    text-align: center;
+}
+.match__list img {
+    width: 8rem;
+    display: block;
+    margin: 0.5rem auto 0;
+}
+.match__list button {
+    display: block;
+    margin: 0.5rem auto;
+}
+.match__desc, .match__time {
+    display: block;
+    line-height: 3rem;
+}
+.match__desc {
+    font-weight: bold;
 }

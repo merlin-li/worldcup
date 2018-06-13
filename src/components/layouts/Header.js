@@ -13,9 +13,10 @@ export default class Header extends React.Component {
                         <i></i>
                         <a href="/">CryptoWorldCup</a>
                     </div>
-                    <div className="worldcup__menu">
+                    <div id="worldcup__menu">
                         <a href="/signin">Start World-Cup</a>
                         <a href="/marketplace">Marketplace</a>
+                        <a href="/groupstage">Group Stage</a>
                         <a href="/prizepool">PrizePool</a>
                     </div>
                     <div></div>
