@@ -1,6 +1,11 @@
 import React from 'react';
 import axios from 'axios';
+import { notification } from 'antd';
+import 'antd/dist/antd.css';
 
+const formatPrice = (price) => {
+    return price / 1000000000000000000;
+};
 export default class Marketplace extends React.Component {
     constructor(props) {
         super(props);
@@ -16,44 +21,52 @@ export default class Marketplace extends React.Component {
     }
 
     buyTeam = (team) => {
-        // WorldCupApp.handleBuyTeam(team.id);
-        // team.price = 11111;
-        // team.name = 'xxxxx';
-        // let copyTeams = this.state.teams;
-        // copyTeams.map(item => {
-        //     if (item.id === team.id) {
-        //         item.price = 22222;
-        //         item.name = 'xxxxx';
-        //         return {
-        //             ...item
-        //         };
-        //     }
-        // });
-        // this.setState({
-        //     teams: copyTeams
-        // });
-        if (window.worldcupContract && window.web3) {
-            let teamId = parseInt(team._tokenId);
+        let copyTeams = this.state.teams;
+        let teamId = parseInt(team._tokenId);
+        let teamPrice = team._price;
+        let teamName = team._name;
+        let teamOwner = team._owner;
+        let me = this;
+        let currentAccount;
 
+        if (window.worldcupContract && window.web3) {
             window.web3.eth.getAccounts((error, accounts) => {
                 if (accounts && accounts.length) {
-                    let currentAccount = accounts[0];
+                    currentAccount = accounts[0];
+
+                    // 如果球队的owner和当前账号为同一人，不能购买
+                    if (currentAccount.toLowerCase() == teamOwner.toLowerCase()) {
+                        notification.warning({
+                            message: 'Failed!',
+                            description: 'You are already the owner of this team!'
+                        });
+                        return;
+                    }
 
                     window.worldcupContract.methods.buyTeam(teamId).send({
                         from: currentAccount,
-                        value: 1
-                    })
-                    .on('transactionHash', hash => {
-                        console.log(hash);
-                    })
-                    .on('confirmation', (confirmationNumber, receipt) => {
-                        console.log(receipt);
-                    })
-                    .on('receipt', receipt => {
-                        console.log(receipt);
-                    })
-                    .on('error', err => {
-                        console.log(err);
+                        value: teamPrice
+                    }).then(receipt => {
+                        notification.success({
+                            message: 'Congratulations!',
+                            description: `You have bought the ${teamName} team successfully!`,
+                        });
+                        // 重新获取当前的球队的价格
+                        copyTeams = copyTeams.map(team => {
+                            if (team._tokenId == teamId) {
+                                team.price = formatPrice(team._price * 2);
+                                team._owner = currentAccount;
+                            }
+                            return {
+                                ...team
+                            };
+                        });
+                        this.setState({ teams: copyTeams });
+                    }).catch(err => {
+                        notification.error({
+                            message: 'Failed!',
+                            description: 'You cannot buy the team!'
+                        });
                     });
                 }
             });
@@ -80,10 +93,6 @@ export default class Marketplace extends React.Component {
         // 连接到以太坊节点
         // web3.setProvider(new Web3.providers.HttpProvider('http://127.0.0.1:7545'));
         var web3 = new Web3(web3Provider);
-
-        let formatPrice = (price) => {
-            return price / 100000000000000000;
-        };
 
         axios.get('/data/SparkCup.json').then(res => {
             let data = res.data;
